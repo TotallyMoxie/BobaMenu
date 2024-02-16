@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JWT Basics</title>
+  </head>
+  <body>
+    <main>
+      <form class="form contact-form">
+        <h5>login/register</h5>
+        <div class="form-row">
+          <label for="username" >username</label>
+          <input type="text" id="username" />
+        </div>
+        <div class="form-row">
+          <label for="menu-order" class="form-label">menu order</label>
+          <input type="menu-order" id="menu-order" />
+        </div>
+       
+        <button type="submit" class="button">submit</button>
+      </form>
+      <div class="container">
+        <p class="token">Your order</p>
+        <div class="result" *ngFor="getOrder"></div>
+      </div>
+    </main>
+
+    <script>
+      const menu = document.querySelector('#menu-order')
+      const username = document.querySelector('#username')
+      const form = document.querySelector('.form')  
+      form.onsubmit = async(e) => {
+          e.preventDefault()
+          try{
+              const res= await fetch('/menu', {method: 'post', body: JSON.stringify({username: username.value}), headers: {'Content-Type': 'application/json'}})
+              const data= await res.json()
+              console.log(data)
+              localStorage.setItem('token', data.token)
+          }catch(err){
+              console.log(err)
+          }
+          /* const res= await fetch('/menu', {method: 'post', body: JSON.stringify({username: username.value, menu: menu.value,}), headers: {'Content-Type': 'application/json'}})
+          console.log(await res.json())
+          return false */
+      }
+
+      async function getOrder() {
+          const token = localStorage.getItem('token')
+          if(token){
+              try{
+                  const res= await fetch('/menu', {method: 'get', headers: {'Authorization': `Bearer ${token}`}})
+                  const data= await res.json()
+                  console.log(data)
+              }catch(err){
+                  console.log(err)
+              }
+           }
+      }
+    </script>
+
+  </body>
+</html>
